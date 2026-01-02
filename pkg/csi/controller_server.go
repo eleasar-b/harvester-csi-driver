@@ -1425,11 +1425,16 @@ func isLHRWXVolume(pvc *corev1.PersistentVolumeClaim) bool {
 			continue
 		}
 
-		// Check if the provisioner is Longhorn
-		if provisioner := pvc.Annotations[utils.AnnStorageProvisioner]; provisioner == longhornProvisioner {
-			return true
+		scName := pvc.Spec.StorageClassName
+		sc, err := client.StorageV1().StorageClasses().Get(ctx, *scName, metav1.GetOptions{})
+
+		if err != nil {
+			logrus.Errorf("Check LHRWX provisioner failed to get SC: %v", err)
 		}
-		logrus.Errorf("Check LHRWX provisioner annotations missmatch: %v", pvc.Annotations)
+		
+		if sc.Provisioner == longhornProvisioner {
+		    return true
+		}
 	}
 	return false
 }
