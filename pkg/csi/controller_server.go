@@ -372,7 +372,7 @@ func (cs *ControllerServer) CreateVolume(ctx context.Context, req *csi.CreateVol
 		}
 		logrus.Infof("ControllerServer created NetworkFS: %v", resNFS)
 	}
-	logrus.Infof("Done for host PVC", hostPVC.Name)
+	logrus.Infof("Done for host PVC %s", hostPVC.Name)
 
 	return &csi.CreateVolumeResponse{
 		Volume: &csi.Volume{
