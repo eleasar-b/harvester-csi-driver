@@ -323,28 +323,34 @@ func (cs *ControllerServer) CreateVolume(ctx context.Context, req *csi.CreateVol
 	}
 
 	// Create a PVC from the host cluster
-	hotsPVC, err := cs.buildHostPVC(ctx, req, volumeParameters, volSizeBytes)
+	hostPVC, err := cs.buildHostPVC(ctx, req, volumeParameters, volSizeBytes)
 	if err != nil {
 		return nil, err
 	}
-	logrus.Infof("The build host PVC %s/%s", hotsPVC.Namespace, hotsPVC.Name)
+	logrus.Infof("Creating host PVC %s/%s", hostPVC.Namespace, hostPVC.Name)
 
-	resHostPVC, err := cs.createHostPVC(hotsPVC)
+	resHostPVC, err := cs.createHostPVC(hostPVC)
 	if err != nil {
+		logrus.Errorf("Host PVC error %v", err)
 		return nil, status.Error(codes.Internal, err.Error())
 	}
+	logrus.Infof("Host PVC result %v", resHostPVC)
 
 	// TODO: we need generalize the RWX volume on next release
 	if isLHRWXVolume(resHostPVC) {
+		logrus.Infof("Host PVC %s is lhrwx volume!", hostPVC.Name)
 		if !cs.waitForLHVolumeName(resHostPVC.Name) {
+			logrus.Errorf("Failed to create volume %s", hostPVC.Name)
 			return nil, status.Errorf(codes.DeadlineExceeded, "Failed to create volume %s", resHostPVC.Name)
 		}
 
 		resPVC, err := cs.coreClient.PersistentVolumeClaim().Get(cs.namespace, resHostPVC.Name, metav1.GetOptions{})
 		if err != nil {
+			logrus.Errorf("Failed to get host PVC %s: %v", hostPVC.Name, err)
 			return nil, status.Errorf(codes.Internal, "Failed to get PVC %s: %v", resPVC.Name, err)
 		}
-
+		logrus.Infof("Must create NFS for host PVC %s", hostPVC.Name)
+		
 		// that means the longhorn RWX volume (NFS), we need to create networkfilesystem CRD
 		networkfilesystem := &networkfsv1.NetworkFilesystem{
 			ObjectMeta: metav1.ObjectMeta{
@@ -366,6 +372,7 @@ func (cs *ControllerServer) CreateVolume(ctx context.Context, req *csi.CreateVol
 		}
 		logrus.Infof("ControllerServer created NetworkFS: %v", resNFS)
 	}
+	logrus.Infof("Done for host PVC", hostPVC.Name)
 
 	return &csi.CreateVolumeResponse{
 		Volume: &csi.Volume{
