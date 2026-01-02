@@ -1426,7 +1426,7 @@ func (cs *ControllerServer) isLHRWXVolume(pvc *corev1.PersistentVolumeClaim) boo
 		}
 
 		scName := pvc.Spec.StorageClassName
-		sc, err := cs.getHostSC(scName)
+		sc, err := cs.getHostSC(*scName)
 
 		if err != nil {
 			logrus.Errorf("Check LHRWX provisioner failed to get SC: %v", err)
