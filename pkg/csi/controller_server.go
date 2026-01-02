@@ -372,6 +372,9 @@ func (cs *ControllerServer) CreateVolume(ctx context.Context, req *csi.CreateVol
 		}
 		logrus.Infof("ControllerServer created NetworkFS: %v", resNFS)
 	}
+	else {
+		logrus.Infof("Host PVC %s is NOT lhrwx volume!", hostPVC.Name)
+	}
 	logrus.Infof("Done for host PVC %s", hostPVC.Name)
 
 	return &csi.CreateVolumeResponse{
@@ -1411,9 +1414,11 @@ func (cs *ControllerServer) waitForLHVolumeName(pvcName string) bool {
 
 func isLHRWXVolume(pvc *corev1.PersistentVolumeClaim) bool {
 	if pvc.Spec.VolumeMode == nil || *pvc.Spec.VolumeMode != corev1.PersistentVolumeFilesystem {
+		logrus.Errorf("Check LHRWX volume mode missmatch: %v", pvc.Spec.VolumeMode)
 		return false
 	}
 	if len(pvc.Spec.AccessModes) == 0 {
+		logrus.Errorf("Check LHRWX access modes missmatch: %v", pvc.Spec.AccessModes)
 		return false
 	}
 	for _, mode := range pvc.Spec.AccessModes {
@@ -1425,7 +1430,7 @@ func isLHRWXVolume(pvc *corev1.PersistentVolumeClaim) bool {
 		if provisioner := pvc.Annotations[utils.AnnStorageProvisioner]; provisioner == longhornProvisioner {
 			return true
 		}
-
+		logrus.Errorf("Check LHRWX provisioner annotations missmatch: %v", pvc.Annotations)
 	}
 	return false
 }
