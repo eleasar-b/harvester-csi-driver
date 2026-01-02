@@ -357,7 +357,14 @@ func (cs *ControllerServer) CreateVolume(ctx context.Context, req *csi.CreateVol
 				Provisioner:   LHName,
 			},
 		}
-		if _, err := cs.harvNetFSClient.HarvesterhciV1beta1().NetworkFilesystems(HarvesterNS).Create(context.TODO(), networkfilesystem, metav1.CreateOptions{}); err != nil {
+
+		logrus.Infof("ControllerServer create NetworkFS: %v", networkfilesystem)
+
+		_, err := cs.harvNetFSClient.HarvesterhciV1beta1().NetworkFilesystems(HarvesterNS).Create(context.TODO(), networkfilesystem, metav1.CreateOptions{})
+		
+		if err != nil {
+			logrus.Errorf("ControllerServer create NetworkFS error: %v", err)
+			
 			return nil, status.Error(codes.Internal, err.Error())
 		}
 	}
