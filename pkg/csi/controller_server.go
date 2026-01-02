@@ -371,8 +371,7 @@ func (cs *ControllerServer) CreateVolume(ctx context.Context, req *csi.CreateVol
 			return nil, status.Error(codes.Internal, err.Error())
 		}
 		logrus.Infof("ControllerServer created NetworkFS: %v", resNFS)
-	}
-	else {
+	} else {
 		logrus.Infof("Host PVC %s is NOT lhrwx volume!", hostPVC.Name)
 	}
 	logrus.Infof("Done for host PVC %s", hostPVC.Name)
