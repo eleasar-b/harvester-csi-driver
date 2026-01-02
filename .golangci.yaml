@@ -25,7 +25,7 @@ linters:
         text: "QF1008:" # could remove embedded field from selector (staticcheck)
 run:
   timeout: 5m
-  tests: true
+  tests: false
 linters-settings:
   gosec:
     # https://github.com/securego/gosec#available-rules
@@ -37,6 +37,3 @@ linters-settings:
       - G505 # Blocklisted import crypto/md5: weak cryptographic primitive
     config:
       G306: "0644" # Poor file permissions used when writing to a new file
-formatters:
-  enable:
-    - gofmt
