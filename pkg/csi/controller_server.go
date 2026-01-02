@@ -350,7 +350,7 @@ func (cs *ControllerServer) CreateVolume(ctx context.Context, req *csi.CreateVol
 			return nil, status.Errorf(codes.Internal, "Failed to get PVC %s: %v", resPVC.Name, err)
 		}
 		logrus.Infof("Must create NFS for host PVC %s", hostPVC.Name)
-		
+
 		// that means the longhorn RWX volume (NFS), we need to create networkfilesystem CRD
 		networkfilesystem := &networkfsv1.NetworkFilesystem{
 			ObjectMeta: metav1.ObjectMeta{
