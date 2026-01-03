@@ -1431,7 +1431,7 @@ func (cs *ControllerServer) isLHRWXVolume(pvc *corev1.PersistentVolumeClaim) boo
 		if err != nil {
 			logrus.Errorf("Check LHRWX provisioner failed to get SC: %v", err)
 		}
-		
+
 		if sc.Provisioner == longhornProvisioner {
 		    return true
 		}
