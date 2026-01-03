@@ -1433,7 +1433,7 @@ func (cs *ControllerServer) isLHRWXVolume(pvc *corev1.PersistentVolumeClaim) boo
 		}
 
 		if sc.Provisioner == longhornProvisioner {
-		    return true
+			return true
 		}
 	}
 	return false
